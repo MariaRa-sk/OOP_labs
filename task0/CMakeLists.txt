@@ -3,7 +3,6 @@ project(task0)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# ОСНОВНОЕ ПРИЛОЖЕНИЕ - только исходные файлы
 add_executable(task0
         src/main.cpp
         src/FileReader.cpp
@@ -14,7 +13,6 @@ add_executable(task0
 
 enable_testing()
 
-# Загрузка GoogleTest - ПРАВИЛЬНЫЙ РЕГИСТР!
 include(FetchContent)
 FetchContent_Declare(
         googletest
@@ -24,25 +22,21 @@ FetchContent_MakeAvailable(googletest)
 
 include(GoogleTest)
 
-# ТЕСТОВЫЕ ИСПОЛНЯЕМЫЕ ФАЙЛЫ - отдельно
 add_executable(test_parser
         test/TestTextParser.cpp
-        src/TextParser.cpp  # только если нужны реализации
+        src/TextParser.cpp
 )
 
 add_executable(test_statistic
         test/TestStatistic.cpp
-        src/Statistic.cpp   # только если нужны реализации
+        src/Statistic.cpp
 )
 
-# Директории include
 target_include_directories(test_parser PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_include_directories(test_statistic PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
-# Связывание с GTest
 target_link_libraries(test_parser PRIVATE GTest::gtest GTest::gtest_main)
 target_link_libraries(test_statistic PRIVATE GTest::gtest GTest::gtest_main)
 
-# Обнаружение тестов
 gtest_discover_tests(test_parser)
 gtest_discover_tests(test_statistic)
