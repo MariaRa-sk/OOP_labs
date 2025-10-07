@@ -6,7 +6,7 @@
 
 class TextParser {
 public:
-    std::vector<std::string> parseLine(const std::string& line);
+    static std::vector<std::string> parseLine(const std::string& line);
 };
 
 #endif
