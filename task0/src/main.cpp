@@ -14,6 +14,7 @@ int main(int argc, char* argv[]) {
     }
 
     FileReader reader(argv[1]);
+    reader.open();
     if (!reader.isOpen()) {
         std::cerr << "Can't open input file: " << argv[1] << "\n";
         return 1;
@@ -28,6 +29,7 @@ int main(int argc, char* argv[]) {
     }
 
     FileWriter writer(argv[2]);
+    writer.open();
     if (!writer.isOpen()) {
         std::cerr << "Can't open output file: " << argv[2] << "\n";
         return 1;
@@ -45,6 +47,7 @@ int main(int argc, char* argv[]) {
         std::vector<std::string> row = {word, count.str(), freq.str()};
         writer.write(row);
     }
-
+    reader.close();
+    writer.close();
     return 0;
 }

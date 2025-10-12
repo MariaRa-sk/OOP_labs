@@ -2,10 +2,19 @@
 
 FileWriter::FileWriter(const std::string &fileName)
     : fileName(fileName){
-    output.open(fileName);
 }
 
 FileWriter::~FileWriter() {
+    if (isOpen()) {
+        output.close();
+    }
+}
+
+void FileWriter::open() {
+    output.open(fileName);
+}
+
+void FileWriter::close() {
     output.close();
 }
 

@@ -12,6 +12,8 @@ private:
 public:
     explicit FileWriter(const std::string& fileName);
     ~FileWriter();
+    void open();
+    void close();
     bool isOpen() const;
     void write(const std::vector<std::string>& row);
 };

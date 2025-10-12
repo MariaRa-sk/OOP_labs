@@ -5,10 +5,19 @@
 
 FileReader::FileReader(const std::string &fileName)
         :fileName(fileName) {
-        input.open(fileName);
 }
 
 FileReader::~FileReader() {
+    if (isOpen()) {
+        input.close();
+    }
+}
+
+void FileReader::open() {
+    input.open(fileName);
+}
+
+void FileReader::close() {
     input.close();
 }
 
