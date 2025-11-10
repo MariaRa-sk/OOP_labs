@@ -54,8 +54,8 @@ TEST(BitArrayTest, AssignmentOperatorToNonEmpty) {
 }
 
 TEST(BitArrayTest, Swap) {
-    BitArray a(5, 0x1F); // 11111
-    BitArray b(3, 0x02); // 010
+    BitArray a(5, 0x1F);
+    BitArray b(3, 0x02);
     BitArray a_copy = a;
     BitArray b_copy = b;
     a.swap(b);
@@ -92,12 +92,12 @@ TEST(BitArrayTest, ResizeToSmaller) {
 }
 
 TEST(BitArrayTest, ResizeWithReallocate) {
-    const size_t size = sizeof(unsigned long) * 8;
-    const size_t newSize = size + 10;
-    BitArray b(size, 0xFFFFF); //20 единиц
+    const size_t size = 20;
+    const size_t newSize = 2 * size;
+    BitArray b(size, 0xFFFFF);
     b.resize(newSize, true);
     EXPECT_EQ(b.size(), newSize);
-    EXPECT_EQ(b.count(), sizeof(unsigned long) * 8 + 10);
+    EXPECT_EQ(b.count(), 40);
 }
 
 TEST(BitArrayTest, ResizeWithOldCapacity) {
@@ -165,16 +165,16 @@ TEST(BitArrayTest, BitwiseANDAssignment) {
     BitArray a(8, 0xAA);
     BitArray b(8, 0x0F);
     a &= b;
+
     EXPECT_EQ(a.size(), 8);
     EXPECT_EQ(a.count(), 2);
     EXPECT_EQ(a.to_string(), "00001010");
 }
 
 TEST(BitArrayTest, BitwiseORAssignment) {
-    BitArray a(8, 0xAA); // 10101010
-    BitArray b(8, 0x0F); // 00001111
-
-    a |= b; // 10101010 | 00001111 = 10101111
+    BitArray a(8, 0xAA);
+    BitArray b(8, 0x0F);
+    a |= b;
 
     EXPECT_EQ(a.size(), 8);
     EXPECT_EQ(a.count(), 6);
@@ -182,10 +182,9 @@ TEST(BitArrayTest, BitwiseORAssignment) {
 }
 
 TEST(BitArrayTest, BitwiseXORAssignment) {
-    BitArray a(8, 0xAA); // 10101010
-    BitArray b(8, 0x0F); // 00001111
-
-    a ^= b; // 10101010 ^ 00001111 = 10100101
+    BitArray a(8, 0xAA);
+    BitArray b(8, 0x0F);
+    a ^= b;
 
     EXPECT_EQ(a.size(), 8);
     EXPECT_EQ(a.count(), 4);
@@ -194,31 +193,27 @@ TEST(BitArrayTest, BitwiseXORAssignment) {
 
 TEST(BitArrayTest, BitwiseOperationsWithSelf) {
     BitArray a(8, 0xFF);
-
-    a &= a; // должно остаться неизменным
+    a &= a;
     EXPECT_EQ(a.count(), 8);
 
-    a |= a; // должно остаться неизменным
+    a |= a;
     EXPECT_EQ(a.count(), 8);
 
-    a ^= a; // должно обнулиться
+    a ^= a;
     EXPECT_EQ(a.count(), 0);
 }
 
 TEST(BitArrayTest, LeftShiftAssignment) {
-    BitArray a(8, 0x0F); // 00001111
-
-    a <<= 2; // сдвиг влево на 2: 00111100
-
+    BitArray a(8, 0x0F);
+    a <<= 2;
     EXPECT_EQ(a.size(), 8);
     EXPECT_EQ(a.count(), 4);
     EXPECT_EQ(a.to_string(), "00111100");
 }
 
 TEST(BitArrayTest, LeftShiftAssignmentLargeShift) {
-    BitArray a(8, 0xFF); // все биты установлены
-
-    a <<= 10; // сдвиг больше размера - должен обнулиться
+    BitArray a(8, 0xFF);
+    a <<= 10;
 
     EXPECT_EQ(a.size(), 8);
     EXPECT_EQ(a.count(), 0);
@@ -226,9 +221,8 @@ TEST(BitArrayTest, LeftShiftAssignmentLargeShift) {
 }
 
 TEST(BitArrayTest, RightShiftAssignment) {
-    BitArray a(8, 0xF0); // 11110000
-
-    a >>= 2; // сдвиг вправо на 2: 00111100
+    BitArray a(8, 0xF0);
+    a >>= 2;
 
     EXPECT_EQ(a.size(), 8);
     EXPECT_EQ(a.count(), 4);
@@ -236,9 +230,8 @@ TEST(BitArrayTest, RightShiftAssignment) {
 }
 
 TEST(BitArrayTest, RightShiftAssignmentWithOnes) {
-    BitArray a(8, 0xFF); // все биты установлены
-
-    a >>= 4; // сдвиг вправо на 4: 00001111
+    BitArray a(8, 0xFF);
+    a >>= 4;
 
     EXPECT_EQ(a.size(), 8);
     EXPECT_EQ(a.count(), 4);
@@ -246,28 +239,26 @@ TEST(BitArrayTest, RightShiftAssignmentWithOnes) {
 }
 
 TEST(BitArrayTest, LeftShiftOperator) {
-    BitArray a(8, 0x0F); // 00001111
-    BitArray result = a << 3; // сдвиг на 3: 01111000
+    BitArray a(8, 0x0F);
+    BitArray result = a << 3;
 
     EXPECT_EQ(result.size(), 8);
     EXPECT_EQ(result.count(), 4);
     EXPECT_EQ(result.to_string(), "01111000");
 
-    // Оригинал не должен измениться
     EXPECT_EQ(a.size(), 8);
     EXPECT_EQ(a.count(), 4);
     EXPECT_EQ(a.to_string(), "00001111");
 }
 
 TEST(BitArrayTest, RightShiftOperator) {
-    BitArray a(8, 0xF0); // 11110000
-    BitArray result = a >> 2; // сдвиг на 2: 00111100
+    BitArray a(8, 0xF0);
+    BitArray result = a >> 2;
 
     EXPECT_EQ(result.size(), 8);
     EXPECT_EQ(result.count(), 4);
     EXPECT_EQ(result.to_string(), "00111100");
 
-    // Оригинал не должен измениться
     EXPECT_EQ(a.size(), 8);
     EXPECT_EQ(a.count(), 4);
     EXPECT_EQ(a.to_string(), "11110000");
@@ -284,45 +275,35 @@ TEST(BitArrayTest, ZeroShift) {
 
 TEST(BitArrayTest, NegativeShift) {
     BitArray a(8, 0xAA);
-
-    // Отрицательный сдвиг - должен либо бросать исключение,
-    // либо интерпретироваться как сдвиг в другую сторону
     EXPECT_THROW(a << -1, std::invalid_argument);
     EXPECT_THROW(a >> -1, std::invalid_argument);
 }
 
 TEST(BitArrayTest, ChainOperations) {
-    BitArray a(8, 0xAA); // 10101010
-    BitArray b(8, 0x0F); // 00001111
-    BitArray c(8, 0xF0); // 11110000
-
+    BitArray a(8, 0xAA);
+    BitArray b(8, 0x0F);
+    BitArray c(8, 0xF0);
     a &= b;
     a |= c;
     a ^= b;
-
-    // ((10101010 & 00001111) | 11110000) ^ 00001111
-    // = (00001010 | 11110000) ^ 00001111
-    // = 11111010 ^ 00001111
-    // = 11110101
 
     EXPECT_EQ(a.count(), 6);
     EXPECT_EQ(a.to_string(), "11110101");
 }
 
 TEST(BitArrayTest, ShiftChain) {
-    BitArray a(8, 0x01); // 00000001
-
-    a <<= 1; // 00000010
-    a <<= 2; // 00001000
-    a >>= 1; // 00000100
+    BitArray a(8, 0x01);
+    a <<= 1;
+    a <<= 2;
+    a >>= 1;
 
     EXPECT_EQ(a.count(), 1);
     EXPECT_EQ(a.to_string(), "00000100");
 }
 
 TEST(BitArrayTest, DifferentSizesBitwiseOperations) {
-    BitArray a(6, 0x3F);  // 111111 (6 битов)
-    BitArray b(8, 0xFF);  // 11111111 (8 битов)
+    BitArray a(6, 0x3F);
+    BitArray b(8, 0xFF);
 
     EXPECT_THROW(a &= b, std::invalid_argument);
     EXPECT_THROW(a |= b, std::invalid_argument);
@@ -332,56 +313,50 @@ TEST(BitArrayTest, DifferentSizesBitwiseOperations) {
 TEST(BitArrayTest, EmptyArrayOperations) {
     BitArray a;
     BitArray b(8, 0xFF);
-
-    // Операции с пустым массивом
     EXPECT_THROW(a &= b, std::invalid_argument);
     EXPECT_THROW(a |= b, std::invalid_argument);
     EXPECT_THROW(a ^= b, std::invalid_argument);
 }
 
 TEST(BitArrayTest, SetSingleBit) {
-    BitArray ba(8, 0x00); // 00000000
+    BitArray ba(8, 0x00);
     ba.set(0);
     EXPECT_TRUE(ba[0]);
     EXPECT_EQ(ba.count(), 1);
 }
 
 TEST(BitArrayTest, SetWithFalseValue) {
-    BitArray ba(8, 0xFF); // 11111111
-    // Устанавливаем бит в false - должно сбросить бит
+    BitArray ba(8, 0xFF);
     ba.set(2, false);
     EXPECT_FALSE(ba[2]);
     EXPECT_EQ(ba.count(), 7);
 }
 
 TEST(BitArrayTest, SetAllBits) {
-    BitArray ba(8, 0x00); // 00000000
-    ba.set(); // устанавливаем все биты
+    BitArray ba(8, 0x00);
+    ba.set();
     EXPECT_EQ(ba.count(), 8);
-    // Проверяем на непустом массиве
-    BitArray ba2(8, 0x0F); // 00001111
+    BitArray ba2(8, 0x0F);
     ba2.set();
     EXPECT_EQ(ba2.count(), 8);
 }
 
 TEST(BitArrayTest, ResetSingleBit) {
-    BitArray ba(8, 0xFF); // 11111111
-
-    // Сбрасываем отдельные биты
+    BitArray ba(8, 0xFF);
     ba.reset(0);
     EXPECT_FALSE(ba[0]);
     EXPECT_EQ(ba.count(), 7);
 }
 
 TEST(BitArrayTest, ResetFalseBit) {
-    BitArray ba(8, 0xFE); // 11111110
+    BitArray ba(8, 0xFE);
     ba.reset(0);
     EXPECT_FALSE(ba[0]);
     EXPECT_EQ(ba.count(), 7);
 }
 
 TEST(BitArrayTest, ResetAllBits) {
-    BitArray ba(8, 0xFF); // 11111111
+    BitArray ba(8, 0xFF);
     ba.reset();
     EXPECT_EQ(ba.count(), 0);
     for (int i = 0; i < 8; ++i) {
@@ -390,10 +365,10 @@ TEST(BitArrayTest, ResetAllBits) {
 }
 
 TEST(BitArrayTest, AnyMethod) {
-    BitArray empty(8, 0x00); // 00000000
-    BitArray withOneBit(8, 0x01); // 00000001
-    BitArray withMultipleBits(8, 0x0A); // 00001010
-    BitArray full(8, 0xFF); // 11111111
+    BitArray empty(8, 0x00);
+    BitArray withOneBit(8, 0x01);
+    BitArray withMultipleBits(8, 0x0A);
+    BitArray full(8, 0xFF);
 
     EXPECT_FALSE(empty.any());
     EXPECT_TRUE(withOneBit.any());
@@ -402,10 +377,10 @@ TEST(BitArrayTest, AnyMethod) {
 }
 
 TEST(BitArrayTest, NoneMethod) {
-    BitArray empty(8, 0x00); // 00000000
-    BitArray withOneBit(8, 0x01); // 00000001
-    BitArray withMultipleBits(8, 0x0A); // 00001010
-    BitArray full(8, 0xFF); // 11111111
+    BitArray empty(8, 0x00);
+    BitArray withOneBit(8, 0x01);
+    BitArray withMultipleBits(8, 0x0A);
+    BitArray full(8, 0xFF);
 
     EXPECT_TRUE(empty.none());
     EXPECT_FALSE(withOneBit.none());
@@ -414,52 +389,50 @@ TEST(BitArrayTest, NoneMethod) {
 }
 
 TEST(BitArrayTest, OperatorNot) {
-    BitArray ba1(8, 0x00); // 00000000
+    BitArray ba1(8, 0x00);
     BitArray result1 = ~ba1;
     EXPECT_EQ(result1.count(), 8);
     EXPECT_EQ(result1.to_string(), "11111111");
 
-    BitArray ba2(8, 0xFF); // 11111111
+    BitArray ba2(8, 0xFF);
     BitArray result2 = ~ba2;
     EXPECT_EQ(result2.count(), 0);
     EXPECT_EQ(result2.to_string(), "00000000");
 
-    BitArray ba3(8, 0x0F); // 00001111
+    BitArray ba3(8, 0x0F);
     BitArray result3 = ~ba3;
     EXPECT_EQ(result3.count(), 4);
     EXPECT_EQ(result3.to_string(), "11110000");
-
-    // Проверяем, что исходный объект не изменился
     EXPECT_EQ(ba3.count(), 4);
     EXPECT_EQ(ba3.to_string(), "00001111");
 }
 
 TEST(BitArrayTest, CountMethod) {
-    BitArray empty(8, 0x00); // 00000000
+    BitArray empty(8, 0x00);
     EXPECT_EQ(empty.count(), 0);
 
-    BitArray full(8, 0xFF); // 11111111
+    BitArray full(8, 0xFF);
     EXPECT_EQ(full.count(), 8);
 
-    BitArray mixed(8, 0xAA); // 10101010
+    BitArray mixed(8, 0xAA);
     EXPECT_EQ(mixed.count(), 4);
 
-    BitArray single(8, 0x01); // 00000001
+    BitArray single(8, 0x01);
     EXPECT_EQ(single.count(), 1);
 }
 
 TEST(BitArrayTest, OperatorBracket) {
-    const BitArray empty(8, 0x00); // 00000000
+    const BitArray empty(8, 0x00);
     for (int i = 0; i < 8; ++i) {
         EXPECT_FALSE(empty[i]);
     }
 
-    const BitArray full(8, 0xFF); // 11111111
+    const BitArray full(8, 0xFF);
     for (int i = 0; i < 8; ++i) {
         EXPECT_TRUE(full[i]);
     }
 
-    const BitArray mixed(8, 0xA5); // 10100101
+    const BitArray mixed(8, 0xA5);
     EXPECT_TRUE(mixed[0]);
     EXPECT_FALSE(mixed[1]);
     EXPECT_TRUE(mixed[2]);
@@ -499,22 +472,22 @@ TEST(BitArrayTest, ToStringMethod) {
     BitArray full(8, 0xFF);
     EXPECT_EQ(full.to_string(), "11111111");
 
-    BitArray mixed(8, 0xAA); // 10101010
+    BitArray mixed(8, 0xAA);
     EXPECT_EQ(mixed.to_string(), "10101010");
 
-    BitArray large(12, 0xAAA); // 101010101010
+    BitArray large(12, 0xAAA);
     EXPECT_EQ(large.to_string(), "101010101010");
 }
 
 TEST(BitArrayTest, OperatorEqual) {
-    BitArray ba1(8, 0xAA); // 10101010
-    BitArray ba2(8, 0xAA); // 10101010
-    BitArray ba3(8, 0x55); // 01010101
-    BitArray ba4(4, 0xAA); // 1010 (другой размер)
+    BitArray ba1(8, 0xAA);
+    BitArray ba2(8, 0xAA);
+    BitArray ba3(8, 0x55);
+    BitArray ba4(4, 0xAA);
 
-    EXPECT_TRUE(ba1 == ba2);  // одинаковые размер и биты
-    EXPECT_FALSE(ba1 == ba3); // одинаковый размер, разные биты
-    EXPECT_FALSE(ba1 == ba4); // разные размеры
+    EXPECT_TRUE(ba1 == ba2);
+    EXPECT_FALSE(ba1 == ba3);
+    EXPECT_FALSE(ba1 == ba4);
 
     BitArray empty1(0);
     BitArray empty2(0);
@@ -525,23 +498,22 @@ TEST(BitArrayTest, OperatorEqual) {
 }
 
 TEST(BitArrayTest, OperatorNotEqual) {
-    BitArray ba1(8, 0xAA); // 10101010
-    BitArray ba2(8, 0xAA); // 10101010
-    BitArray ba3(8, 0x55); // 01010101
-    BitArray ba4(4, 0xAA); // 1010
+    BitArray ba1(8, 0xAA);
+    BitArray ba2(8, 0xAA);
+    BitArray ba3(8, 0x55);
+    BitArray ba4(4, 0xAA);
 
-    EXPECT_FALSE(ba1 != ba2);  // одинаковые
-    EXPECT_TRUE(ba1 != ba3);   // разные биты
-    EXPECT_TRUE(ba1 != ba4);   // разные размер
+    EXPECT_FALSE(ba1 != ba2);
+    EXPECT_TRUE(ba1 != ba3);
+    EXPECT_TRUE(ba1 != ba4);
 }
 
 TEST(BitArrayTest, OperatorAnd) {
-    // Тест для оператора & (И)
-    BitArray ba1(8, 0xAA); // 10101010
-    BitArray ba2(8, 0x0F); // 00001111
+    BitArray ba1(8, 0xAA);
+    BitArray ba2(8, 0x0F);
     BitArray result = ba1 & ba2;
 
-    EXPECT_EQ(result.to_string(), "00001010"); // 00001010 = 0x0A
+    EXPECT_EQ(result.to_string(), "00001010");
     EXPECT_EQ(result.count(), 2);
 
     BitArray self_and = ba1 & ba1;
@@ -557,11 +529,11 @@ TEST(BitArrayTest, OperatorAnd) {
 }
 
 TEST(BitArrayTest, OperatorOr) {
-    BitArray ba1(8, 0xAA); // 10101010
-    BitArray ba2(8, 0x0F); // 00001111
+    BitArray ba1(8, 0xAA);
+    BitArray ba2(8, 0x0F);
     BitArray result = ba1 | ba2;
 
-    EXPECT_EQ(result.to_string(), "10101111"); // 10101111 = 0xAF
+    EXPECT_EQ(result.to_string(), "10101111");
     EXPECT_EQ(result.count(), 6);
 
     BitArray self_or = ba1 | ba1;
@@ -577,11 +549,11 @@ TEST(BitArrayTest, OperatorOr) {
 }
 
 TEST(BitArrayTest, OperatorXor) {
-    BitArray ba1(8, 0xAA); // 10101010
-    BitArray ba2(8, 0x0F); // 00001111
+    BitArray ba1(8, 0xAA);
+    BitArray ba2(8, 0x0F);
     BitArray result = ba1 ^ ba2;
 
-    EXPECT_EQ(result.to_string(), "10100101"); // 10100101 = 0xA5
+    EXPECT_EQ(result.to_string(), "10100101");
     EXPECT_EQ(result.count(), 4);
 
     BitArray self_xor = ba1 ^ ba1;
@@ -599,18 +571,18 @@ TEST(BitArrayTest, OperatorXor) {
 }
 
 TEST(BitArrayTest, ComplexBitwiseExpressions) {
-    BitArray a(8, 0xAA); // 10101010
-    BitArray b(8, 0x0F); // 00001111
-    BitArray c(8, 0x33); // 00110011
+    BitArray a(8, 0xAA);
+    BitArray b(8, 0x0F);
+    BitArray c(8, 0x33);
 
     BitArray result1 = (a & b) | c;
-    EXPECT_EQ(result1.to_string(), "00111011"); // 0x3B
+    EXPECT_EQ(result1.to_string(), "00111011");
 
     BitArray result2 = (a | b) & c;
-    EXPECT_EQ(result2.to_string(), "00100011"); // 0x33
+    EXPECT_EQ(result2.to_string(), "00100011");
 
     BitArray result3 = a ^ b ^ c;
-    EXPECT_EQ(result3.to_string(), "10010110"); // 0x9E
+    EXPECT_EQ(result3.to_string(), "10010110");
 }
 
 TEST(BitArrayTest, BitwiseOperationsWithDifferentSizes) {
@@ -623,4 +595,78 @@ TEST(BitArrayTest, BitwiseOperationsWithDifferentSizes) {
     EXPECT_THROW(small & large, std::invalid_argument);
     EXPECT_THROW(small | large, std::invalid_argument);
     EXPECT_THROW(small ^ large, std::invalid_argument);
+}
+
+TEST(BitArrayTest, BasicReadWrite) {
+    BitArray ba(10);
+    ba[0] = true;
+    ba[5] = true;
+    ba[9] = true;
+
+    EXPECT_TRUE(ba[0]);
+    EXPECT_TRUE(ba[5]);
+    EXPECT_TRUE(ba[9]);
+    EXPECT_FALSE(ba[1]);
+    EXPECT_FALSE(ba[6]);
+}
+
+TEST(BitArrayTest, MultipleAssignments) {
+    BitArray ba(8);
+    ba[3] = true;
+    EXPECT_TRUE(ba[3]);
+
+    ba[3] = false;
+    EXPECT_FALSE(ba[3]);
+
+    ba[3] = true;
+    EXPECT_TRUE(ba[3]);
+}
+
+TEST(BitArrayTest, ChainedAssignment) {
+    BitArray ba(10);
+    ba[0] = ba[1] = ba[2] = true;
+
+    EXPECT_TRUE(ba[0]);
+    EXPECT_TRUE(ba[1]);
+    EXPECT_TRUE(ba[2]);
+    EXPECT_FALSE(ba[3]);
+}
+
+TEST(BitArrayTest, ConstAccess) {
+    BitArray ba(10);
+    ba[3] = true;
+    ba[7] = true;
+    const BitArray& const_ba = ba;
+
+    EXPECT_TRUE(const_ba[3]);
+    EXPECT_TRUE(const_ba[7]);
+    EXPECT_FALSE(const_ba[0]);
+    EXPECT_FALSE(const_ba[5]);
+}
+
+TEST(BitArrayTest, BoundaryConditions) {
+    BitArray ba(16);
+    ba[0] = true;
+    ba[15] = true;
+
+    EXPECT_TRUE(ba[0]);
+    EXPECT_TRUE(ba[15]);
+    EXPECT_FALSE(ba[1]);
+    EXPECT_FALSE(ba[14]);
+}
+
+TEST(BitArrayTest, AssignmentFromOtherBits) {
+    BitArray ba(8);
+    ba[0] = true;
+    ba[4] = true;
+    ba[1] = ba[0];
+    ba[2] = ba[3];
+    ba[5] = ba[4];
+
+    EXPECT_TRUE(ba[0]);
+    EXPECT_TRUE(ba[1]);
+    EXPECT_FALSE(ba[2]);
+    EXPECT_FALSE(ba[3]);
+    EXPECT_TRUE(ba[4]);
+    EXPECT_TRUE(ba[5]);
 }

@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <stdexcept>
-
 #include <iostream>
 
 static void checkArgument(int arg){
@@ -52,7 +51,6 @@ BitArray::BitArray(int size, unsigned long value) {
     bitSize = size;
     capacity = (bitSize + BITS_PER_LONG - 1)/BITS_PER_LONG;
     array = new unsigned long[capacity]();
-
     array[0] = value & getMask();
 }
 
@@ -67,16 +65,24 @@ BitArray::BitArray(const BitArray &other): array(nullptr), bitSize(other.bitSize
 
 BitArray::BitProxy::BitProxy(BitArray& bitArray, int bitPos) : bitArray(bitArray), bitPos(bitPos) {};
 
-BitArray::BitProxy::operator bool() const {  //преобразует BitProxy в bool
-    return bitArray.operator[](bitPos);
+BitArray::BitProxy::operator bool() const {
+    return static_cast<const BitArray&>(bitArray).operator[](bitPos);
 }
 
 BitArray::BitProxy& BitArray::BitProxy::operator=(bool value) {
-    if (value) {
-        bitArray.set(bitPos);
-    } else {
-        bitArray.reset(bitPos);
-    }
+    bitArray.set(bitPos, value);
+    return *this;
+}
+
+BitArray::BitProxy BitArray::operator[](int bitPos) {
+    checkNotEmpty();
+    checkBitPos(bitPos);
+    return BitProxy(*this, bitPos);
+}
+
+BitArray::BitProxy& BitArray::BitProxy::operator=(const BitProxy& other) {
+    const bool value = static_cast<bool>(other);
+    bitArray.set(bitPos, value);
     return *this;
 }
 
@@ -151,7 +157,9 @@ void BitArray::reallocate(const size_t newCapacity, const size_t newSize, const 
     if (value) {
         size_t newBits = newSize - bitSize;
         size_t oldLastBlockSize = bitSize % BITS_PER_LONG;
-        newArray[capacity - 1] |= ~0UL << oldLastBlockSize;
+        if (oldLastBlockSize > 0) {
+            newArray[capacity - 1] |= ~0UL << oldLastBlockSize;
+        }
         for (size_t i = capacity; i < newCapacity; ++i) {
             newArray[i] = ~0UL;
         }
@@ -165,7 +173,6 @@ void BitArray::reallocate(const size_t newCapacity, const size_t newSize, const 
 
 void BitArray::resize(int newSize, bool value) {
     checkArgument(newSize);
-
     if (newSize == 0) {
         clear();
         return;
@@ -173,7 +180,6 @@ void BitArray::resize(int newSize, bool value) {
     if (newSize == bitSize) {
         return;
     }
-
     if (newSize < bitSize) {
         for (size_t i = newSize; i < bitSize; ++i) {
             reset(static_cast<int>(i));
@@ -199,7 +205,8 @@ void BitArray::push_back(const bool bit) {
     const size_t newCapacity = (newBitSize + BITS_PER_LONG - 1) / BITS_PER_LONG;
     if (newCapacity > capacity) {
         reallocate(newCapacity, newBitSize, false);
-    } else {
+    }
+    else {
         bitSize = newBitSize;
     }
     set(static_cast<int>(bitSize - 1), bit);

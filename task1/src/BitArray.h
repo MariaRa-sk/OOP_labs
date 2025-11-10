@@ -23,6 +23,7 @@ private:
     BitProxy(BitArray& bitArray, int bitPos);
     operator bool() const;
     BitProxy& operator=(bool value);
+    BitProxy& operator=(const BitProxy& other);
   };
 
 public:
@@ -55,7 +56,6 @@ public:
   BitArray& operator&=(const BitArray& other);
   BitArray& operator|=(const BitArray& other);
   BitArray& operator^=(const BitArray& other);
-
   BitArray& operator<<=(int shift);
   BitArray& operator>>=(int shift);
   BitArray operator<<(int shift) const;
@@ -81,8 +81,11 @@ public:
   //Counts the number of single bits.
   int count() const;
 
-  //Returns the value of the bit at index i.
+  //Returns the value of the bit at index i. For constant objects (read-only).
   bool operator[](int bitPos) const;
+  // For non-constant objects (reading and writing)
+  BitProxy operator[](int bitPos);
+
   int size() const;
   bool empty() const;
 
