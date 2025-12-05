@@ -1,4 +1,6 @@
+#include <iostream>
 #include "GameConfig.h"
+#include "FileWriter.h"
 
 GameConfig::Mode GameConfig::getMode() const {
    return mode;
@@ -79,6 +81,3 @@ int GameConfig::getHeight() const{
 void GameConfig::setFieldHeight(int height) {
    fieldHeight = height;
 }
-
-
-

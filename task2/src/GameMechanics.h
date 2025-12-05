@@ -5,7 +5,7 @@
 
 class GameMechanics {
 private:
-    GameConfig& config;
+    GameConfig config;
     std::vector<std::vector<bool>> oldField;
     std::vector<std::vector<bool>> currentField;
     size_t currentIteration = 0;
@@ -20,7 +20,9 @@ public:
     const std::vector<std::vector<bool>>& getField() const;
     size_t getCurrentIteration() const;
 
-    void step(); //одна итерация тип
+    void step();
+    void updateConfigCells();
+    void saveInFile(const std::string fileName) const;
 };
 
 #endif

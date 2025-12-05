@@ -1,9 +1,8 @@
 #include "Parser.h"
-
 #include <iostream>
 #include <sstream>
 
-bool isOnlyDigits(const std::string &str) {
+bool ArgumentParser::isOnlyDigits(const std::string &str) {
     for (char c : str) {
         if (!isdigit(c)) {
             return false;
@@ -36,11 +35,9 @@ bool Parser::parseFormat(const std::string &formatLine) {
 
 std::string Parser::parseUniverseName(const std::string &universeNameLine) {
     size_t nPos = universeNameLine.find("#N");
-
     if (nPos == std::string::npos) {
         throw std::runtime_error("Invalid universe name format: missing #N");
     }
-
     size_t nameStart = nPos + 2;
     if (nameStart >= universeNameLine.length()) {
         return "Unnamed Universe";
@@ -56,11 +53,9 @@ std::string Parser::parseUniverseName(const std::string &universeNameLine) {
 
 std::pair<std::vector<int>, std::vector<int>> Parser::parseRule(const std::string& ruleLine) {
     size_t rPos = ruleLine.find("#R");
-
     if (rPos == std::string::npos) {
-        throw std::runtime_error("Rule not found: missing #R in rule line");
+        throw std::runtime_error("Invalid rules format: missing #R");
     }
-
     size_t bPos = ruleLine.find('B');
     size_t sPos = ruleLine.find('S');
     size_t slashPos = ruleLine.find('/');
@@ -72,8 +67,7 @@ std::pair<std::vector<int>, std::vector<int>> Parser::parseRule(const std::strin
         std::cout << "Invalid rule format: wrong order of 'B', '/' or 'S'. Default rules B3/S23 will be used." << std::endl;
         return {{3}, {2, 3}};
     }
-    std::vector<int> birthRule;
-    std::vector<int> survivalRule;
+    std::vector<int> birthRule, survivalRule;
     std::string birthStr = ruleLine.substr(bPos + 1, slashPos - bPos - 1);
     std::string survivalStr = ruleLine.substr(sPos + 1);
     for (char c : birthStr) {
@@ -98,22 +92,19 @@ std::pair<std::vector<int>, std::vector<int>> Parser::parseRule(const std::strin
             std::cout << "Warning: Duplicate digit " << digit << " in survival rule. Skipped." << std::endl;
             continue;
         }
-        survivalRule.push_back(c - '0');
+        survivalRule.push_back(digit);
     }
     return {birthRule, survivalRule};
 }
 
 std::pair<int, int> Parser::parseFieldSize(const std::string& fieldSizeLine) {
     size_t sPos = fieldSizeLine.find("#S");
-
     if (sPos == std::string::npos) {
-        throw std::runtime_error("Field size not found: missing #S in size line");
+        throw std::runtime_error("Invalid size format: missing #S");
     }
-
     size_t cPos = fieldSizeLine.find('C');
-    size_t rPos = fieldSizeLine.find('R');
+    size_t rPos= fieldSizeLine.find('R');
     size_t slashPos = fieldSizeLine.find('/');
-
     if (cPos == std::string::npos || rPos == std::string::npos || slashPos == std::string::npos) {
         std::cout << "Invalid rule format: missing 'C', 'R' or '/'. Default size 30x30 will be used." << std::endl;
         return {30, 30};
@@ -124,18 +115,21 @@ std::pair<int, int> Parser::parseFieldSize(const std::string& fieldSizeLine) {
     }
     std::string colsStr = fieldSizeLine.substr(cPos + 1, slashPos - cPos - 1);
     std::string rowsStr = fieldSizeLine.substr(rPos + 1);
-
     if (colsStr.empty() || rowsStr.empty()) {
         std::cout << "Empty size value. Default size 30x30 will be used." << std::endl;
         return {30, 30};
     }
-    if (!isOnlyDigits(colsStr)) {
-        std::cout << "Invalid character in columns. Default size 30x30 will be used." << std::endl;
-        return {30, 30};
+    for (char c:colsStr) {
+        if (!isdigit(c)) {
+            std::cout << "Invalid character in columns. Default size 30x30 will be used." << std::endl;
+            return {30, 30};
+        }
     }
-    if (!isOnlyDigits(rowsStr)) {
-        std::cout << "Invalid character in columns. Default size 30x30 will be used." << std::endl;
-        return {30, 30};
+    for (char c:rowsStr) {
+        if (!isdigit(c)) {
+            std::cout << "Invalid character in rows. Default size 30x30 will be used." << std::endl;
+            return {30, 30};
+        }
     }
     int columns = std::stoi(colsStr);
     int rows = std::stoi(rowsStr);
@@ -143,9 +137,13 @@ std::pair<int, int> Parser::parseFieldSize(const std::string& fieldSizeLine) {
         std::cout << "Zero size value. Default size 30x30 will be used." << std::endl;
         return {30, 30};
     }
+    if (columns > 70 || rows > 40) {
+        std::cout << "Field size " << columns << "x" << rows << " is too large. Maximum allowed size is 70x40. Default size 30x30 will be used." << std::endl;
+        return {30, 30};
+    }
     weight = columns;
     height = rows;
-    return {columns, rows};   //добавить проверку на слишком большое число которое не будет вмещаться на консоли?
+    return {columns, rows};
 }
 
 std::vector<std::pair<int, int>> Parser::parseCellField(const std::vector<std::string>& lines) {
@@ -156,11 +154,11 @@ std::vector<std::pair<int, int>> Parser::parseCellField(const std::vector<std::s
             std::cout << "Warning: Line" << (i + 1)<< " - empty - skipped."<< std::endl;
             continue;
         }
-        std::istringstream iss(line);
+        std::istringstream stream(line);
         int x, y;
-        if (iss >> x >> y) {
+        if (stream >> x >> y) {
             std::string remaining;
-            if (iss >> remaining) {
+            if (stream >> remaining) {
                 std::cout << "Warning: Line " << (i + 1) << " - extra data after two numbers - skipped" << std::endl;
                 continue;
             }
@@ -191,24 +189,21 @@ GameConfig ArgumentParser::parseArguments(int argc, char* argv[]) {
         config.setMode(GameConfig::Mode::DEMO_MODE);
         return config;
     }
-
     std::vector<std::string> args;
     for (int i = 1; i < argc; ++i) {
         args.emplace_back(argv[i]);
     }
-
     if (args.size() == 1 && args[0][0] != '-') {
         config.setMode(GameConfig::Mode::FILE_MODE);
         config.setInputFile(args[0]);
         return config;
     }
-
     config.setMode(GameConfig::Mode::OFFLINE_MODE);
     config.setIterations(1);
 
-    for (size_t i = 0; i < args.size(); i++) {
+    for (size_t i = 0; i < args.size(); ++i) {
         const std::string& arg = args[i];
-        if (arg == "-i" || arg == "--iterations") {
+        if (arg == "-i") {
             if (i + 1 < args.size()) {
                 std::string value = args[i + 1];
                 if (!isOnlyDigits(value)) {
@@ -222,16 +217,15 @@ GameConfig ArgumentParser::parseArguments(int argc, char* argv[]) {
                 throw std::invalid_argument("Missing value for " + arg);
             }
         }
-
         else if (arg.find("--iterations=") == 0) {
-            std::string value = arg.substr(13); // длина "--iterations="
+            std::string value = arg.substr(std::string("--iterations=").length());
             if (!isOnlyDigits(value)) {
                 throw std::invalid_argument("Invalid iterations value: " + value);
             }
             size_t iterations = static_cast<size_t>(std::stoi(value));
             config.setIterations(iterations);
         }
-        else if (arg == "-o" || arg == "--output") {
+        else if (arg == "-o") {
             if (i + 1 < args.size()) {
                 config.setOutputFile(args[i + 1]);
                 i++;
@@ -241,7 +235,7 @@ GameConfig ArgumentParser::parseArguments(int argc, char* argv[]) {
             }
         }
         else if (arg.find("--output=") == 0) {
-            config.setOutputFile(arg.substr(9));
+            config.setOutputFile(arg.substr(std::string("--output=").length()));
         }
         else if (arg[0] == '-') {
             throw std::invalid_argument("Unknown option: " + arg);
@@ -263,8 +257,7 @@ GameConfig ArgumentParser::parseArguments(int argc, char* argv[]) {
     return config;
 }
 
-GameConfig Parser::parseFile() {
-    GameConfig config;
+void Parser::parseFile(GameConfig& config) {
     reader.open();
     if (!reader.isOpen()) {
         throw std::runtime_error("Cannot open file: " + reader.getFileName());
@@ -272,38 +265,22 @@ GameConfig Parser::parseFile() {
     if (reader.isEOF()) {
         throw std::runtime_error("File is empty");
     }
-
     std::string formatLine = reader.getLine();
     if (!parseFormat(formatLine)) {
         throw std::runtime_error("Invalid file format: expected #Life 1.06");
     }
     std::string name = reader.getLine();
     config.setUniverseName(parseUniverseName(name));
-    std::cout << "NAME: " << config.getUniverseName() << std::endl;
 
     auto rules = reader.getLine();
     auto parseR = parseRule(rules);
     config.setRuleBirth(parseR.first);
     config.setRuleSurvival(parseR.second);
 
-    std::cout << "Birth rules: ";
-    for (int rule : config.getRuleBirth()) {
-        std::cout << rule << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "Survival rules: ";
-    for (int rule : config.getRuleSurvival()) {
-        std::cout << rule << " ";
-    }
-    std::cout << std::endl;
-
     auto sizes = reader.getLine();
     auto parseS = parseFieldSize(sizes);
     config.setFieldWidth(parseS.first);
     config.setFieldHeight(parseS.second);
-
-    std::cout << config.getWidth() << "," << config.getHeight() <<std::endl;
 
     std::vector<std::string> cellLines;
     while (!reader.isEOF()) {
@@ -314,14 +291,5 @@ GameConfig Parser::parseFile() {
         throw std::runtime_error("No cell data found in file");
     }
     config.setCells(parseCellField(cellLines));
-
-    std::cout << "Cells in config: " << std::endl;
-    const auto& cells = config.getCells();
-    for (size_t i = 0; i < cells.size(); ++i) {
-        std::cout << "Cell " << (i + 1) << ": (" << cells[i].first << ", " << cells[i].second << ")" << std::endl;
-    }
-
-
-    return config;
 }
 

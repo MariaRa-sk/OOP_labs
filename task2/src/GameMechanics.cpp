@@ -1,12 +1,13 @@
 #include "GameMechanics.h"
+#include "FileWriter.h"
+#include <iostream>
 
-GameMechanics::GameMechanics(GameConfig &config): config(config) {}
+GameMechanics::GameMechanics(GameConfig& config): config(config) {}
 
 void GameMechanics::initializeField() {
     size_t width = config.getWidth();
     size_t height = config.getHeight();
     currentField.resize(height, std::vector<bool>(width, false));
-
     for (const auto& cell : config.getCells()) {
         int x = cell.first;
         int y = cell.second;
@@ -18,17 +19,13 @@ void GameMechanics::initializeField() {
 size_t GameMechanics::countNeighbors(size_t x, size_t y) const {
     size_t width = config.getWidth();
     size_t height = config.getHeight();
-    size_t leftX =  (x - 1 + width) % width;
-    size_t rightX = (x + 1 + width) % width;
-    size_t lowY = (y - 1 + height) % height;
-    size_t topY = (y + 1 + height) % height;
     size_t count = 0;
-
-    for (size_t i = lowY; i <= topY; ++i) {
-        for (size_t j = leftX; j <= rightX; ++j) {
-            if (!(i == y && j==x) & isAlive(j, i)) {
-                count++;
-            }
+    for (int dx = -1; dx <= 1; ++dx) {
+        for (int dy = -1; dy <= 1; ++dy) {
+            if (dx == 0 && dy == 0) continue;
+            size_t newX = (x + dx + width) % width;
+            size_t newY = (y + dy + height) % height;
+            if (isAlive(newX, newY)) count++;
         }
     }
     return count;
@@ -57,7 +54,6 @@ void GameMechanics::step() {
             size_t neighbors = countNeighbors(x, y);
             bool shouldBirth = false;
             bool shouldSurvival = false;
-
             if (isAlive(x,y)) {
                 for (int rule : survival) {
                     if (neighbors == rule) {
@@ -84,3 +80,37 @@ void GameMechanics::step() {
     }
     oldField = currentField;
 }
+
+void GameMechanics::saveInFile(const std::string fileName) const {
+    FileWriter writer(fileName);
+    writer.open();
+    if (!writer.isOpen()) {
+        std::cout << "Error: Cannot open file " << fileName << " for writing" << std::endl;
+        return;
+    }
+    writer.write({"#Life 1.06"});
+    writer.write({"#N " + config.getUniverseName()});
+    std::string birthStr, survivalStr;
+    for (int r : config.getRuleBirth()) birthStr += std::to_string(r);
+    for (int r : config.getRuleSurvival()) survivalStr += std::to_string(r);
+    writer.write({"#R B" + birthStr + "/S" + survivalStr});
+    writer.write({"#S C" + std::to_string(config.getWidth()) + "/R" + std::to_string(config.getHeight())});
+    for (const auto& cell : config.getCells()) {
+        writer.write({std::to_string(cell.first) + " " + std::to_string(cell.second)});
+    }
+    writer.close();
+    std::cout << "Universe saved to: " << fileName << std::endl;
+}
+
+void GameMechanics::updateConfigCells() {
+    std::vector<std::pair<int, int>> aliveCells;
+    for (size_t y = 0; y < currentField.size(); ++y) {
+        for (size_t x = 0; x < currentField[y].size(); ++x) {
+            if (isAlive(x,y)) {
+                aliveCells.emplace_back(x, y);
+            }
+        }
+    }
+    config.setCells(aliveCells);
+}
+

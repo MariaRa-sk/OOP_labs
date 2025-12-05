@@ -34,7 +34,7 @@ public:
     const std::string& getUniverseName() const;
     void setUniverseName(const std::string& name);
 
-    std::vector<std::pair<int, int>> getCells() const; //?? что с ссылкой и конст
+    std::vector<std::pair<int, int>> getCells() const;
     void setCells(std::vector<std::pair<int, int>> c);
 
     size_t getIterations() const;
