@@ -9,32 +9,24 @@ add_executable(task2 src/main.cpp
         src/GameConfig.cpp
         src/CommandHandler.cpp
         src/GameMechanics.cpp
-        src/GameMechanics.h
         src/Window.cpp
-        src/Window.h
+        src/FileWriter.cpp
+        src/Patterns.cpp
+        src/Controller.cpp
 )
 
-include(FetchContent)
-FetchContent_Declare(
-        glfw
-        GIT_REPOSITORY https://github.com/glfw/glfw.git
-        GIT_TAG 3.3.8
+target_include_directories(task2 PRIVATE
+        ${CMAKE_SOURCE_DIR}/src
+        "C:/Users/kuzin/SFML/SFML-2.6.2/include"
 )
-FetchContent_MakeAvailable(glfw)
 
-# Ищем OpenGL (обычно входит в систему)
-find_package(OpenGL REQUIRED)
+target_link_directories(task2 PRIVATE "C:/Users/kuzin/SFML/SFML-2.6.2/lib")
 
 target_link_libraries(task2
-        OpenGL::GL
-        glfw
+        sfml-graphics
+        sfml-window
+        sfml-system
 )
-
-if(WIN32)
-    target_link_libraries(task2
-            gdi32
-    )
-endif()
 
 enable_testing()
 
@@ -48,16 +40,15 @@ FetchContent_MakeAvailable(googletest)
 
 include(GoogleTest)
 
-add_executable(test_parser
-        test/ParserTest.cpp
-        src/Parser.cpp
-        src/FileReader.cpp
+add_executable(test_mechanics
+        test/GameMechanicsTest.cpp
+        src/GameMechanics.cpp
         src/GameConfig.cpp
+        src/FileWriter.cpp
+        src/FileReader.cpp
+        src/Parser.cpp
 )
 
-
-target_include_directories(test_parser PRIVATE ${CMAKE_SOURCE_DIR}/src)
-
-target_link_libraries(test_parser PRIVATE GTest::gtest GTest::gtest_main)
-
-gtest_discover_tests(test_parser)
+target_include_directories(test_mechanics PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(test_mechanics PRIVATE GTest::gtest GTest::gtest_main)
+gtest_discover_tests(test_mechanics)
