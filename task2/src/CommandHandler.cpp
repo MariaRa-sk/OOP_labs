@@ -56,7 +56,7 @@ void CommandHandler::handleHelp() {
 
 bool CommandHandler::handleCommand(const std::string& command) {
     if (command.empty()) return true;
-    std::vector<std::string> commands = parseCommand(command);
+    std::vector<std::string> commands = getCommand(command);
     std::string cmd = commands[0];
     std::transform(cmd.begin(), cmd.end(), cmd.begin(), ::tolower);
     if (cmd == "dump") handleDump(commands);
@@ -73,7 +73,7 @@ bool CommandHandler::handleCommand(const std::string& command) {
     return true;
 }
 
-std::vector<std::string> CommandHandler::parseCommand(const std::string &command) {
+std::vector<std::string> CommandHandler::getCommand(const std::string &command) {
     std::vector<std::string> commands;
     std::stringstream stream(command);
     std::string i;

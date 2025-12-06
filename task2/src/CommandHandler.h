@@ -16,7 +16,7 @@ private:
     void handleTick(const std::vector<std::string>& args);
     void handleExit();
     void handleHelp();
-    std::vector<std::string> parseCommand(const std::string &command);
+    std::vector<std::string>getCommand(const std::string &command);
 public:
     CommandHandler(GameMechanics& game, Controller& controller);
     bool handleCommand(const std::string& command);
