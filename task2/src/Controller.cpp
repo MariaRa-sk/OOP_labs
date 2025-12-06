@@ -79,7 +79,7 @@ void Controller::runOfflineMode() {
     }
     render();
     sf::sleep(sf::seconds(2));
-    game->saveInFile(config.getOutputFile());
+    game->getConfig().saveInFile(config.getOutputFile());
     if (window) {
         window->close();
     }

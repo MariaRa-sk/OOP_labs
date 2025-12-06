@@ -22,7 +22,8 @@ public:
 
     void step();
     void updateConfigCells();
-    void saveInFile(const std::string fileName) const;
+
+    const GameConfig& getConfig() const;
 };
 
 #endif

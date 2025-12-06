@@ -81,27 +81,6 @@ void GameMechanics::step() {
     oldField = currentField;
 }
 
-void GameMechanics::saveInFile(const std::string fileName) const {
-    FileWriter writer(fileName);
-    writer.open();
-    if (!writer.isOpen()) {
-        std::cout << "Error: Cannot open file " << fileName << " for writing" << std::endl;
-        return;
-    }
-    writer.write({"#Life 1.06"});
-    writer.write({"#N " + config.getUniverseName()});
-    std::string birthStr, survivalStr;
-    for (int r : config.getRuleBirth()) birthStr += std::to_string(r);
-    for (int r : config.getRuleSurvival()) survivalStr += std::to_string(r);
-    writer.write({"#R B" + birthStr + "/S" + survivalStr});
-    writer.write({"#S C" + std::to_string(config.getWidth()) + "/R" + std::to_string(config.getHeight())});
-    for (const auto& cell : config.getCells()) {
-        writer.write({std::to_string(cell.first) + " " + std::to_string(cell.second)});
-    }
-    writer.close();
-    std::cout << "Universe saved to: " << fileName << std::endl;
-}
-
 void GameMechanics::updateConfigCells() {
     std::vector<std::pair<int, int>> aliveCells;
     for (size_t y = 0; y < currentField.size(); ++y) {
@@ -114,3 +93,6 @@ void GameMechanics::updateConfigCells() {
     config.setCells(aliveCells);
 }
 
+const GameConfig& GameMechanics::getConfig() const {
+    return config;
+}

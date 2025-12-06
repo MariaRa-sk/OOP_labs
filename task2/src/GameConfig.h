@@ -57,6 +57,8 @@ public:
 
     int getHeight() const;
     void setFieldHeight(int height);
+
+    void saveInFile(const std::string& fileName) const;
 };
 
 #endif
