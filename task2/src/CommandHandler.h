@@ -14,8 +14,8 @@ private:
     bool shouldExit;
     void handleDump(const std::vector<std::string>& args);
     void handleTick(const std::vector<std::string>& args);
-    void handleExit(const std::vector<std::string>& args);
-    void handleHelp(const std::vector<std::string>& args);
+    void handleExit();
+    void handleHelp();
     std::vector<std::string> parseCommand(const std::string &command);
 public:
     CommandHandler(GameMechanics& game, Controller& controller);

@@ -40,12 +40,12 @@ void CommandHandler::handleTick(const std::vector<std::string>& args) {
     }
 }
 
-void CommandHandler::handleExit(const std::vector<std::string>& args) {
+void CommandHandler::handleExit() {
     shouldExit = true;
     std::cout << "Exiting game..." << std::endl;
 }
 
-void CommandHandler::handleHelp(const std::vector<std::string>& args) {
+void CommandHandler::handleHelp() {
     std::cout << "Available commands:\n"
               << "  dump <filename>    - Save universe to file\n"
               << "  tick <n=1>         - Advance n iterations (default 1)\n"
@@ -62,10 +62,10 @@ bool CommandHandler::handleCommand(const std::string& command) {
     if (cmd == "dump") handleDump(commands);
     else if (cmd == "tick" || cmd == "t") handleTick(commands);
     else if (cmd == "exit" || cmd == "quit") {
-        handleExit(commands);
+        handleExit();
         return false;
     }
-    else if (cmd == "help") handleHelp(commands);
+    else if (cmd == "help") handleHelp();
     else {
         std::cout << "Unknown command: " << command << std::endl;
         std::cout << "Type 'help' for available commands" << std::endl;

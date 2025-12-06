@@ -1,5 +1,4 @@
 #include "Window.h"
-#include <stdexcept>
 #include <iostream>
 
 Window::Window(size_t width, size_t height, const std::vector<std::vector<bool>>& field): rows(field.size()), columns(field[0].size()){
