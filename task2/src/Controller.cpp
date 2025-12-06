@@ -53,18 +53,12 @@ void Controller::runFileMode() {
 }
 
 void Controller::runOfflineMode() {
-    if (!std::filesystem::exists(config.getInputFile())) {
-        std::cout << "Error: Input file '" << config.getInputFile() << "' not found!" << std::endl;
-        return;
-    }
     Parser parser(config.getInputFile());
     parser.parseFile(config);
     game = new GameMechanics(config);
     game->initializeField();
     size_t iterations = config.getIterations();
     window = new Window(1500, 900, game->getField());
-    std::cout << "DEBUG: Window created, isOpen = " << window->isOpen() << std::endl;
-
     render();
     sf::sleep(sf::milliseconds(500));
     isRunning = true;
