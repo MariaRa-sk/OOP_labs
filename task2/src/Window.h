@@ -2,7 +2,6 @@
 #define WINDOW_H
 
 #include <SFML/Graphics.hpp>
-#include "GameMechanics.h"
 #include <string>
 
 class Window {
