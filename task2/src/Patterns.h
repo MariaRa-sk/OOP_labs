@@ -12,10 +12,10 @@ private:
     std::map<std::string, std::vector<std::pair<int, int>>> patterns;
     std::mt19937 rng;
     void initializePatterns();
+    GameConfig getPatternByName(const std::string& name);
 public:
     Patterns();
     GameConfig getRandomPattern();
-    GameConfig getPatternByName(const std::string& name);
 };
 
 #endif

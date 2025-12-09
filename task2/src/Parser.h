@@ -13,11 +13,11 @@ private:
     size_t height = 30;
     FileReader reader;
     std::vector<std::pair<int, int>> cells;
-    static bool isDuplicateRule(int digit, const std::vector<int>& rules);
+    bool isDuplicateRule(int digit, const std::vector<int>& rules);
     bool isDuplicateCell(int x, int y);
-    static bool parseFormat(const std::string& formatLine);
-    static std::string parseUniverseName(const std::string& universeNameLine);
-    static std::pair<std::vector<int>, std::vector<int>> parseRule(const std::string& ruleLine);
+    bool parseFormat(const std::string& formatLine);
+    std::string parseUniverseName(const std::string& universeNameLine);
+    std::pair<std::vector<int>, std::vector<int>> parseRule(const std::string& ruleLine);
     std::pair<int, int> parseFieldSize(const std::string& fieldSizeLine);
     std::vector<std::pair<int, int>> parseCellField(const std::vector<std::string>& lines);
 public:
