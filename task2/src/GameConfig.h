@@ -5,12 +5,6 @@
 #include <vector>
 
 class GameConfig {
-public:
-    enum class Mode {
-        DEMO_MODE,
-        FILE_MODE,
-        OFFLINE_MODE,
-    };
 private:
     std::string universeName = "Unnamed Universe";
 
@@ -20,31 +14,14 @@ private:
     int fieldWidth = 30;
     int fieldHeight = 30;
 
-    std::vector<std::pair<int, int>> cells;
-    Mode mode = Mode::DEMO_MODE;
-
-    std::string inputFile;
-    size_t iterations = 1;
-    std::string outputFile;
-
+    std::vector<std::pair<int, int>> aliveCells;
 public:
-    Mode getMode() const;
-    void setMode(Mode m);
 
     const std::string& getUniverseName() const;
     void setUniverseName(const std::string& name);
 
-    std::vector<std::pair<int, int>> getCells() const;
-    void setCells(std::vector<std::pair<int, int>> c);
-
-    size_t getIterations() const;
-    void setIterations(size_t i);
-
-    const std::string& getInputFile() const;
-    void setInputFile(const std::string& input);
-
-    const std::string& getOutputFile() const;
-    void setOutputFile(const std::string& input);
+    std::vector<std::pair<int, int>> getAliveCells() const;
+    void setAliveCells(std::vector<std::pair<int, int>> c);
 
     const std::vector<int>& getRuleBirth() const;
     void setRuleBirth(const std::vector<int>& ruleB);

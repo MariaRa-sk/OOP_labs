@@ -3,6 +3,7 @@
 
 #include "FileReader.h"
 #include "GameConfig.h"
+#include "ProgramOptions.h"
 
 #include <string>
 #include <vector>
@@ -21,14 +22,14 @@ private:
     std::vector<std::pair<int, int>> parseCellField(const std::vector<std::string>& lines);
 public:
     explicit Parser(const std::string& fileName): reader(fileName){}
-    void parseFile(GameConfig& config);
+    GameConfig parseFile();
 };
 
 class ArgumentParser {
 private:
-    static bool isOnlyDigits(const std::string& str);
+    bool isOnlyDigits(const std::string& str);
 public:
-    static GameConfig parseArguments(int argc, char* argv[]);
+    ProgramOptions parseArguments(int argc, char* argv[]);
 };
 
 #endif

@@ -5,7 +5,6 @@
 
 #include "CommandHandler.h"
 #include "Controller.h"
-#include "FileWriter.h"
 
 CommandHandler::CommandHandler(GameMechanics& game, Controller& controller)
     : game(game), controller(controller),shouldExit(false) {}
@@ -16,7 +15,7 @@ void CommandHandler::handleDump(const std::vector<std::string>& args) {
         return;
     }
     const std::string& filename = args[1];
-    game.getConfig().saveInFile(filename);
+    controller.getGameConfig().saveInFile(filename);
 }
 
 void CommandHandler::handleTick(const std::vector<std::string>& args) {

@@ -11,7 +11,6 @@ class Patterns {
 private:
     std::map<std::string, std::vector<std::pair<int, int>>> patterns;
     std::mt19937 rng;
-
     void initializePatterns();
 public:
     Patterns();

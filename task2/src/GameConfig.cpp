@@ -2,14 +2,6 @@
 #include "GameConfig.h"
 #include "FileWriter.h"
 
-GameConfig::Mode GameConfig::getMode() const {
-   return mode;
-}
-
-void GameConfig::setMode(Mode m) {
-   mode = m;
-}
-
 const std::string& GameConfig::getUniverseName() const {
    return universeName;
 }
@@ -18,36 +10,12 @@ void GameConfig::setUniverseName(const std::string& name) {
    universeName = name;
 }
 
-std::vector<std::pair<int, int>> GameConfig::getCells() const {
-   return cells;
+std::vector<std::pair<int, int>> GameConfig::getAliveCells() const {
+   return aliveCells;
 }
 
-void GameConfig::setCells(std::vector<std::pair<int, int>> c) {
-   cells = c;
-}
-
-size_t GameConfig::getIterations() const {
-   return iterations;
-}
-
-void GameConfig::setIterations(size_t i) {
-   iterations = i;
-}
-
-const std::string& GameConfig::getInputFile() const {
-   return inputFile;
-}
-
-void GameConfig::setInputFile(const std::string& input) {
-   inputFile = input;
-}
-
-const std::string& GameConfig::getOutputFile() const {
-   return outputFile;
-}
-
-void GameConfig::setOutputFile(const std::string& output) {
-   outputFile = output;
+void GameConfig::setAliveCells(std::vector<std::pair<int, int>> c) {
+   aliveCells = c;
 }
 
 const std::vector<int>& GameConfig::getRuleBirth() const{
@@ -96,7 +64,7 @@ void GameConfig::saveInFile(const std::string& fileName) const {
    for (int r : getRuleSurvival()) survivalStr += std::to_string(r);
    writer.write("#R B" + birthStr + "/S" + survivalStr);
    writer.write("#S C" + std::to_string(getWidth()) + "/R" + std::to_string(getHeight()));
-   for (const auto& cell : getCells()) {
+   for (const auto& cell : getAliveCells()) {
       writer.write({std::to_string(cell.first) + " " + std::to_string(cell.second)});
    }
    writer.close();

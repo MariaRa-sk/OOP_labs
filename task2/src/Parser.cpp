@@ -183,24 +183,23 @@ std::vector<std::pair<int, int>> Parser::parseCellField(const std::vector<std::s
     return cells;
 }
 
-GameConfig ArgumentParser::parseArguments(int argc, char* argv[]) {
-    GameConfig config;
+ProgramOptions ArgumentParser::parseArguments(int argc, char* argv[]) {
+    ProgramOptions options;
     if (argc == 1) {
-        config.setMode(GameConfig::Mode::DEMO_MODE);
-        return config;
+        options.setMode(ProgramOptions::Mode::DEMO_MODE);
+        return options;
     }
     std::vector<std::string> args;
     for (int i = 1; i < argc; ++i) {
         args.emplace_back(argv[i]);
     }
     if (args.size() == 1 && args[0][0] != '-') {
-        config.setMode(GameConfig::Mode::FILE_MODE);
-        config.setInputFile(args[0]);
-        return config;
+        options.setMode(ProgramOptions::Mode::FILE_MODE);
+        options.setInputFile(args[0]);
+        return options;
     }
-    config.setMode(GameConfig::Mode::OFFLINE_MODE);
-    config.setIterations(1);
-
+    options.setMode(ProgramOptions::Mode::OFFLINE_MODE);
+    options.setIterations(1);
     for (size_t i = 0; i < args.size(); ++i) {
         const std::string& arg = args[i];
         if (arg == "-i") {
@@ -210,7 +209,7 @@ GameConfig ArgumentParser::parseArguments(int argc, char* argv[]) {
                     throw std::invalid_argument("Invalid iterations value: " + value);
                 }
                 size_t iterations = static_cast<size_t>(std::stoi(value));
-                config.setIterations(iterations);
+                options.setIterations(iterations);
                 i++;
             }
             else {
@@ -223,11 +222,11 @@ GameConfig ArgumentParser::parseArguments(int argc, char* argv[]) {
                 throw std::invalid_argument("Invalid iterations value: " + value);
             }
             size_t iterations = static_cast<size_t>(std::stoi(value));
-            config.setIterations(iterations);
+            options.setIterations(iterations);
         }
         else if (arg == "-o") {
             if (i + 1 < args.size()) {
-                config.setOutputFile(args[i + 1]);
+                options.setOutputFile(args[i + 1]);
                 i++;
             }
             else {
@@ -235,29 +234,30 @@ GameConfig ArgumentParser::parseArguments(int argc, char* argv[]) {
             }
         }
         else if (arg.find("--output=") == 0) {
-            config.setOutputFile(arg.substr(std::string("--output=").length()));
+            options.setOutputFile(arg.substr(std::string("--output=").length()));
         }
         else if (arg[0] == '-') {
             throw std::invalid_argument("Unknown option: " + arg);
         }
         else {
-            if (config.getInputFile().empty()) {
-                config.setInputFile(arg);
+            if (options.getInputFile().empty()) {
+                options.setInputFile(arg);
             } else {
                 throw std::invalid_argument("Unexpected argument: " + arg);
             }
         }
     }
-    if (config.getInputFile().empty()) {
+    if (options.getInputFile().empty()) {
         throw std::invalid_argument("Input file is required for offline mode");
     }
-    if (config.getOutputFile().empty()) {
+    if (options.getOutputFile().empty()) {
         throw std::invalid_argument("Output file is required for offline mode");
     }
-    return config;
+    return options;
 }
 
-void Parser::parseFile(GameConfig& config) {
+GameConfig Parser::parseFile() {
+    GameConfig config;
     reader.open();
     if (!reader.isOpen()) {
         throw std::runtime_error("Cannot open file: " + reader.getFileName());
@@ -290,6 +290,7 @@ void Parser::parseFile(GameConfig& config) {
     if (cellLines.empty()) {
         throw std::runtime_error("No cell data found in file");
     }
-    config.setCells(parseCellField(cellLines));
+    config.setAliveCells(parseCellField(cellLines));
+    return config;
 }
 
