@@ -15,7 +15,7 @@ void CommandHandler::handleDump(const std::vector<std::string>& args) {
         return;
     }
     const std::string& filename = args[1];
-    controller.getGameConfig().saveInFile(filename);
+    controller.saveInFile(filename);
 }
 
 void CommandHandler::handleTick(const std::vector<std::string>& args) {

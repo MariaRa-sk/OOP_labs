@@ -1,10 +1,11 @@
 #include <filesystem>
 #include <iostream>
 
-#include "Parser.h"
-#include "Patterns.h"
 #include "CommandHandler.h"
 #include "Controller.h"
+#include "FileWriter.h"
+#include "Parser.h"
+
 
 Controller::Controller(GameConfig config, ProgramOptions options):
     config(config),
@@ -62,7 +63,7 @@ void Controller::runOfflineMode() {
     }
     render();
     sf::sleep(sf::seconds(2));
-    config.saveInFile(options.getOutputFile());
+    saveInFile(options.getOutputFile());
     window.close();
 }
 
@@ -95,6 +96,30 @@ void Controller::processEvents() {
     }
 }
 
-GameConfig Controller::getGameConfig() const {
-    return config;
+void Controller::saveInFile(const std::string& fileName) const {
+    FileWriter writer(fileName);
+    writer.open();
+    if (!writer.isOpen()) {
+        std::cout << "Error: Cannot open file " << fileName << " for writing" << std::endl;
+        return;
+    }
+    writer.write("#Life 1.06");
+    writer.write("#N " + config.getUniverseName());
+    std::string birthStr, survivalStr;
+    for (int r : config.getRuleBirth()) birthStr += std::to_string(r);
+    for (int r : config.getRuleSurvival()) survivalStr += std::to_string(r);
+    writer.write("#R B" + birthStr + "/S" + survivalStr);
+    writer.write("#S C" + std::to_string(config.getWidth()) + "/R" + std::to_string(config.getHeight()));
+
+    const std::vector<std::vector<bool>>& currentField = game.getField();
+
+    for (int y = 0; y < currentField.size(); y++) {
+        for (int x = 0; x < currentField[0].size(); x++) {
+            if (currentField[y][x]) {
+                writer.write(std::to_string(x) + " " + std::to_string(y));
+            }
+        }
+    }
+    writer.close();
+    std::cout << "Universe saved to: " << fileName << std::endl;
 }

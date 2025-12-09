@@ -20,10 +20,8 @@ private:
     void initializeField();
 public:
     explicit GameMechanics(GameConfig& config);
-
     const std::vector<std::vector<bool>>& getField() const;
     size_t getCurrentIteration() const;
-
     void step();
 };
 

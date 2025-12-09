@@ -13,9 +13,9 @@ class Controller {
 private:
     GameConfig config;
     ProgramOptions options;
-    GameMechanics game;            // Всегда существует
-    Window window;                 // Всегда существует
-    CommandHandler* commandHandler = nullptr; // Только этот указатель
+    GameMechanics game;
+    Window window;
+    CommandHandler* commandHandler = nullptr;
     bool isRunning = false;
 
     void runFileMode();
@@ -27,7 +27,7 @@ public:
     ~Controller();
     void run();
     void render();
-    GameConfig getGameConfig() const;
+    void saveInFile(const std::string& fileName) const;
 };
 
 #endif
